@@ -197,45 +197,30 @@ trust_boundaries:
 
   VPC:
     id: vpc
-    tags: 
-    technical_assets_inside: 
     trust_boundaries_nested:
-      - publicsubnet1
-      - publicsubnet2
-      - privatesubnet1
-      - privatesubnet2
+    - publicsubnet1
+    - publicsubnet2
+    - privatesubnet1
+    - privatesubnet2
     type: network-cloud-security-group
 
   PublicSubnet1:
     id: publicsubnet1
-    tags: 
-    technical_assets_inside: 
-    trust_boundaries_nested: 
     type: network-cloud-security-group
 
   PublicSubnet2:
     id: publicsubnet2
-    tags: 
-    technical_assets_inside: 
-      - some-other-component
-    trust_boundaries_nested: 
     type: network-cloud-security-group
 
   PrivateSubnet1:
     id: privatesubnet1
-    tags: 
-    technical_assets_inside: 
-    trust_boundaries_nested: 
     type: network-cloud-security-group
 
   PrivateSubnet2:
     id: privatesubnet2
-    tags: 
-    technical_assets_inside: 
-    trust_boundaries_nested: 
     type: network-cloud-security-group
-
-
+    technical_assets_inside: 
+    - some-other-component
 
 
 shared_runtimes:
