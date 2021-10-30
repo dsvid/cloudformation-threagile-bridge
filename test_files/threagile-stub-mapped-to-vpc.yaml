@@ -162,39 +162,159 @@ technical_assets:
 
   Some Other Tecnical Asset:
     id: some-other-component
-    description: Some Description
+    # description: Some Description
     type: process # values: external-entity, process, datastore
     usage: business # values: business, devops
-    used_as_client_by_human: false
-    out_of_scope: false
-    justification_out_of_scope:
+    # used_as_client_by_human: false
+    # out_of_scope: false
+    # justification_out_of_scope:
     size: component # values: system, service, application, component
     technology: web-service-rest # values: see help
-    tags:
-      - some-tag
-      - some-other-tag
-    internet: false
+    # tags:
+    #   - some-tag
+    #   - some-other-tag
+    # internet: false
     machine: virtual # values: physical, virtual, container, serverless
     encryption: none # values: none, transparent, data-with-symmetric-shared-key, data-with-asymmetric-shared-key, data-with-enduser-individual-key
-    owner: Some Owner
+    # owner: Some Owner
     confidentiality: confidential # values: public, internal, restricted, confidential, strictly-confidential
     integrity: critical # values: archive, operational, important, critical, mission-critical
     availability: critical # values: archive, operational, important, critical, mission-critical
-    justification_cia_rating: Some Justification
-    multi_tenant: false
-    redundant: false
-    custom_developed_parts: true
-    data_assets_processed: # sequence of IDs to reference
-      - some-data
-    data_assets_stored: # sequence of IDs to reference
-    data_formats_accepted: # sequence of formats like: json, xml, serialization, file, csv
-      - xml
-    communication_links:
+    # justification_cia_rating: Some Justification
+    # multi_tenant: false
+    # redundant: false
+    # custom_developed_parts: true
+    # data_assets_processed: # sequence of IDs to reference
+    #   - some-data
+    # data_assets_stored: # sequence of IDs to reference
+    # data_formats_accepted: # sequence of formats like: json, xml, serialization, file, csv
+    #   - xml
+    # communication_links:
+
+  DefaultPrivateRoute1:
+    availability: critical
+    confidentiality: confidential
+    encryption: none
+    id: defaultprivateroute1
+    integrity: critical
+    machine: virtual
+    size: component
+    technology: web-service-rest
+    type: process
+    usage: business
+  DefaultPrivateRoute2:
+    availability: critical
+    confidentiality: confidential
+    encryption: none
+    id: defaultprivateroute2
+    integrity: critical
+    machine: virtual
+    size: component
+    technology: web-service-rest
+    type: process
+    usage: business
+  DefaultPublicRoute:
+    availability: critical
+    confidentiality: confidential
+    encryption: none
+    id: defaultpublicroute
+    integrity: critical
+    machine: virtual
+    size: component
+    technology: web-service-rest
+    type: process
+    usage: business
+  InternetGateway:
+    availability: critical
+    confidentiality: confidential
+    encryption: none
+    id: internetgateway
+    integrity: critical
+    machine: virtual
+    size: component
+    technology: web-service-rest
+    type: process
+    usage: business
+  NatGateway1:
+    availability: critical
+    confidentiality: confidential
+    encryption: none
+    id: natgateway1
+    integrity: critical
+    machine: virtual
+    size: component
+    technology: web-service-rest
+    type: process
+    usage: business
+  NatGateway1EIP:
+    availability: critical
+    confidentiality: confidential
+    encryption: none
+    id: natgateway1eip
+    integrity: critical
+    machine: virtual
+    size: component
+    technology: web-service-rest
+    type: process
+    usage: business
+  NatGateway2:
+    availability: critical
+    confidentiality: confidential
+    encryption: none
+    id: natgateway2
+    integrity: critical
+    machine: virtual
+    size: component
+    technology: web-service-rest
+    type: process
+    usage: business
+  NatGateway2EIP:
+    availability: critical
+    confidentiality: confidential
+    encryption: none
+    id: natgateway2eip
+    integrity: critical
+    machine: virtual
+    size: component
+    technology: web-service-rest
+    type: process
+    usage: business
 
 
 
 trust_boundaries:
 
+  PrivateRouteTable1:
+    id: privateroutetable1
+    technical_assets_inside:
+    - defaultprivateroute1
+    type: network-cloud-security-group
+  PrivateRouteTable2:
+    id: privateroutetable2
+    technical_assets_inside:
+    - defaultprivateroute2
+    type: network-cloud-security-group
+  PrivateSubnet1:
+    id: privatesubnet1
+    type: network-cloud-security-group
+  PrivateSubnet2:
+    id: privatesubnet2
+    type: network-cloud-security-group
+  PublicRouteTable:
+    id: publicroutetable
+    technical_assets_inside:
+    - defaultpublicroute
+    type: network-cloud-security-group
+  PublicSubnet1:
+    id: publicsubnet1
+    technical_assets_inside:
+    - natgateway1
+    type: network-cloud-security-group
+  PublicSubnet2:
+    id: publicsubnet2
+    technical_assets_inside:
+    - natgateway2
+    type: network-cloud-security-group
   VPC:
     id: vpc
     trust_boundaries_nested:
@@ -202,25 +322,10 @@ trust_boundaries:
     - publicsubnet2
     - privatesubnet1
     - privatesubnet2
+    - publicroutetable
+    - privateroutetable1
+    - privateroutetable2
     type: network-cloud-security-group
-
-  PublicSubnet1:
-    id: publicsubnet1
-    type: network-cloud-security-group
-
-  PublicSubnet2:
-    id: publicsubnet2
-    type: network-cloud-security-group
-
-  PrivateSubnet1:
-    id: privatesubnet1
-    type: network-cloud-security-group
-
-  PrivateSubnet2:
-    id: privatesubnet2
-    type: network-cloud-security-group
-    technical_assets_inside: 
-    - some-other-component
 
 
 shared_runtimes:
