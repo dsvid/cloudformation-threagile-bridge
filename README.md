@@ -50,7 +50,7 @@ We have also made this tool open source, with the intention of allowing you to d
 
 This project is still in progress, so the number of Cloud Formation -> Threagile mappings is currently limited. We are continuing to add more mappings, and this will be an ongoing process.
 
-Beyond more mappings, the primary feature that I am hoping to add is a report of which Cloud Formation concepts have been auto-mapped, and which have not. This should aid visibility a lot.
+Beyond more mappings, the primary features that I am hoping to add is a report of which Cloud Formation concepts have been auto-mapped, and which have not, plus the ability to detect when a CloudFormation concept has already been mapped (so as not to duplicate it).
 
 Additionally, my current to-do list is:
 
