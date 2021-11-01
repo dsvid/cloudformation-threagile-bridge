@@ -1,17 +1,29 @@
 import json
 import yaml
-import os
+import sys
 
-path_to_json = os.path.join("test_files", "vpc_cf_example.json")
+path_to_cf_template = sys.argv[1]
+path_to_threagile_input_yaml = sys.argv[2]
+path_to_threagile_output_yaml = sys.argv[3]
 
-with open(path_to_json) as cf_json:
+# open the cf template
+with open(path_to_cf_template) as cf_json:
     cf_data = json.load(cf_json)
+
+# open the starting threagile yaml
+with open(path_to_threagile_input_yaml) as existing_thrg:
+    thrg_yaml_parsed = yaml.safe_load(existing_thrg)
+
+# print(yaml.dump(thrg_yaml_parsed, default_flow_style=False))
 
 # initialize the different categories we want to capture for threagile's input
 trust_boundaries = {}
 technical_assets = {}
 data_assets = {}
 communication_links = {}
+
+# initialize the yaml output (could just overwrite the existing thrg_yaml_parsed)
+yaml_output = thrg_yaml_parsed
 
 # the AWS resource types that we want to auto-parse into certain categories
 outer_trust_boundaries_types = [
@@ -29,6 +41,8 @@ technical_asset_types = [
     'AWS::EC2::EIP',
     'AWS::EC2::InternetGateway'
 ]
+
+
 
 def parse_cf_resources_for_trust_boundaries(cf_template):
     '''
@@ -88,17 +102,36 @@ def parse_cf_resources_for_technical_assets(cf_template):
                     dict_temp = {'technical_assets_inside': [i.lower()]}
                     if cf_data['Resources'][i]['Properties'][j]['Ref'] in trust_boundaries:
                         trust_boundaries[cf_data['Resources'][i]['Properties'][j]['Ref']].update(dict_temp)
-                    # print(i)
-                    # print(cf_data['Resources'][i]['Properties'][j]['Ref'])
-                    # print(cf_data['Resources'][i]['Properties'][j])
 
 
-
+print("parsing CF template for trust boundaries")
 parse_cf_resources_for_trust_boundaries(cf_data)
+
+print("parsing CF template for trust technical assets")
 parse_cf_resources_for_technical_assets(cf_data)
 
-print(yaml.dump(trust_boundaries, default_flow_style=False))
 
-print("\n")
+# if the existing yaml was empty for the parts we're going to add to, then initialize them
+if yaml_output['technical_assets'] is None:
+    yaml_output['technical_assets'] = {}
 
-print(yaml.dump(technical_assets, default_flow_style=False))
+if yaml_output['trust_boundaries'] is None:
+    yaml_output['trust_boundaries'] = {}
+
+
+# add the things that we've translated to the existing parsed yaml
+print("adding parsed trust boundaries to parsed threagile yaml input")
+yaml_output['trust_boundaries'].update(trust_boundaries)
+
+print("adding parsed technical assets to parsed threagile yaml input")
+yaml_output['technical_assets'].update(technical_assets)
+
+
+with open(path_to_threagile_output_yaml, 'w') as output:
+    # will print with the same ordering of root elements
+    # not needed per yaml spec, but nicer for readability
+    print("writing updated threagile yaml to output file")
+    for i in yaml_output:
+        print(yaml.dump({i: yaml_output[i]}, default_flow_style=False), file=output)
+
+print("done")
