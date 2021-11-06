@@ -1,14 +1,23 @@
 import json
 import yaml
 import sys
+import os
 
 path_to_cf_template = sys.argv[1]
 path_to_threagile_input_yaml = sys.argv[2]
 path_to_threagile_output_yaml = sys.argv[3]
 
-# open the cf template
-with open(path_to_cf_template) as cf_json:
-    cf_data = json.load(cf_json)
+cf_file_extension = os.path.splitext(path_to_cf_template)[-1]
+
+assert(cf_file_extension in [".yaml", ".json"]), "input must be json or yaml"
+
+if cf_file_extension == ".json":
+    # open the cf template
+    with open(path_to_cf_template) as cf_json:
+        cf_data = json.load(cf_json)
+elif cf_file_extension == ".yaml":
+    with open(path_to_cf_template) as cf_yaml:
+        cf_data = yaml.safe_load(cf_yaml)
 
 # open the starting threagile yaml
 with open(path_to_threagile_input_yaml) as existing_thrg:
@@ -55,8 +64,11 @@ def parse_cf_resources_for_trust_boundaries(cf_template):
             # look through the other resources for subnets and keep track in a list any that are subnets in this VPC
             for j in cf_data['Resources']:
                 if cf_data['Resources'][j]['Type'] in inner_trust_boundaries_types:
-                    if cf_data['Resources'][j]['Properties']['VpcId']['Ref'] == i:
-                        nested_boundaries.append(j.lower())
+                    try:
+                        if cf_data['Resources'][j]['Properties']['VpcId']['Ref'] == i:
+                            nested_boundaries.append(j.lower())
+                    except KeyError:
+                        print(j, "has no properties")
             # the nested trust boundaries that we just found will be included in the append
             trust_boundaries[i] = {
                     'id': i.lower(), 
@@ -93,15 +105,18 @@ def parse_cf_resources_for_technical_assets(cf_template):
                 'integrity': 'critical', # values: archive, operational, important, critical, mission-critical
                 'availability': 'critical', # values: archive, operational, important, critical, mission-critical
             }
-            for j in cf_data['Resources'][i]['Properties']:
-                # check for references to trust boundaries and add them as links if found
-                if 'Ref' in cf_data['Resources'][i]['Properties'][j]:
-                    # just used lower() here because we use the lowercase earlier for the id...
-                    # probably better to reference the actual id of the trust boundary that we defined earlier
-                    # but I just want to get this working lol...
-                    dict_temp = {'technical_assets_inside': [i.lower()]}
-                    if cf_data['Resources'][i]['Properties'][j]['Ref'] in trust_boundaries:
-                        trust_boundaries[cf_data['Resources'][i]['Properties'][j]['Ref']].update(dict_temp)
+            try:
+                for j in cf_data['Resources'][i]['Properties']:
+                    # check for references to trust boundaries and add them as links if found
+                    if 'Ref' in cf_data['Resources'][i]['Properties'][j]:
+                        # just used lower() here because we use the lowercase earlier for the id...
+                        # probably better to reference the actual id of the trust boundary that we defined earlier
+                        # but I just want to get this working lol...
+                        dict_temp = {'technical_assets_inside': [i.lower()]}
+                        if cf_data['Resources'][i]['Properties'][j]['Ref'] in trust_boundaries:
+                            trust_boundaries[cf_data['Resources'][i]['Properties'][j]['Ref']].update(dict_temp)
+            except KeyError:
+                print(i, "has no properties")
 
 
 print("parsing CF template for trust boundaries")
