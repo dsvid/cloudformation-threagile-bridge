@@ -23,6 +23,12 @@ elif cf_file_extension == ".yaml":
 with open(path_to_threagile_input_yaml) as existing_thrg:
     thrg_yaml_parsed = yaml.safe_load(existing_thrg)
 
+resources_not_mapped = []
+resources_mapped = []
+
+for i in cf_data['Resources']:
+    resources_not_mapped.append(i)
+
 # print(yaml.dump(thrg_yaml_parsed, default_flow_style=False))
 
 # initialize the different categories we want to capture for threagile's input
@@ -51,7 +57,9 @@ technical_asset_types = [
     'AWS::EC2::InternetGateway'
 ]
 
-
+def mark_resource_as_mapped(resource):
+    resources_not_mapped.remove(resource)
+    resources_mapped.append(resource)
 
 def parse_cf_resources_for_trust_boundaries(cf_template):
     '''
@@ -77,6 +85,7 @@ def parse_cf_resources_for_trust_boundaries(cf_template):
                     # 'technical_assets_inside':'', 
                     'trust_boundaries_nested': nested_boundaries
                 }
+            mark_resource_as_mapped(i)
 
         elif cf_data['Resources'][i]['Type'] in inner_trust_boundaries_types:
             # if the resource is a subnet, then just add it as a trust boundary with no nested boundaries
@@ -87,6 +96,7 @@ def parse_cf_resources_for_trust_boundaries(cf_template):
                     # 'technical_assets_inside':'', 
                     # 'trust_boundaries_nested':''
                 }
+            mark_resource_as_mapped(i)
 
 def parse_cf_resources_for_technical_assets(cf_template):
     # means we're trawling the template a few times, but just a bit easier for now cos we want to
@@ -105,6 +115,7 @@ def parse_cf_resources_for_technical_assets(cf_template):
                 'integrity': 'critical', # values: archive, operational, important, critical, mission-critical
                 'availability': 'critical', # values: archive, operational, important, critical, mission-critical
             }
+            mark_resource_as_mapped(i)
             try:
                 for j in cf_data['Resources'][i]['Properties']:
                     # check for references to trust boundaries and add them as links if found
@@ -148,5 +159,18 @@ with open(path_to_threagile_output_yaml, 'w') as output:
     print("writing updated threagile yaml to output file")
     for i in yaml_output:
         print(yaml.dump({i: yaml_output[i]}, default_flow_style=False), file=output)
+
+# for i in trust_boundaries:
+#     print(i)
+# for i in technical_assets:
+#     print(i)
+# for i in data_assets:
+#     print(i)
+# for i in communication_links:
+#     print(i)
+# print("\n")
+
+print("resources mapped", resources_mapped)
+print("resources not mapped", resources_not_mapped)
 
 print("done")
