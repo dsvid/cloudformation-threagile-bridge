@@ -19,11 +19,19 @@ It is not designed to *fully* automate a threat modelling workflow, as there wil
 
 We are hoping that it will help to ease *some* of the manual work of defining assets/communication links/etc. in threagile's yaml inputs.
 
+Over time, we aim to add more translation rules with the goal of automating threat modelling as many CloudFormation resource types as possible, but this will be an ongoing process as this tool matures.
+
 ## How to run?
+
+First make sure the requirements are installed (currently only pyyaml)
+
+```
+pip install -r requirements.txt
+```
 
 Currently the script requires 3 arguments:
 - path to CF template (either yaml or json)
-- path to existing threagile yaml to be added to
+- path to existing threagile yaml to be added to. This might already have some content populated manually.
 - path to output updated threagile yaml to
 
 For example, you might run it like:
