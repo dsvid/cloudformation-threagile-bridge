@@ -29,7 +29,15 @@ Currently the script requires 3 arguments:
 For example, you might run it like:
 
 ```
-python main.py "test_files/vpc_cf_example.json" "test_files/threagile-stub-input.yaml" "test_files/output_yaml_alt.yaml"
+python main.py "test_files/vpc_cf_example.json" "test_files/threagile-stub-input.yaml" "test_files/output_yaml.yaml"
+```
+
+The output file can then be run through Threagile by following its readme https://github.com/Threagile/threagile 
+
+If you have Docker installed and have output to a file called "output_yaml.yaml" an example threagile run command might look like:
+
+```
+docker run --rm -it -v "$(pwd)":/app/work threagile/threagile -verbose -model /app/work/output_yaml.yaml -output /app/work
 ```
 
 ## What would a workflow using this tool + Threagile look like?
