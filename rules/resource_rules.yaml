@@ -34,6 +34,10 @@ technical-assets:
     size: component
     technology: gateway
     machine: virtual  # maybe machine should be inferred in the code?
+    can_communicate_with: # should be AWS resource types
+      AWS::EC2::NatGateway:
+        property_name: NatGatewayId # the name of the property that this mapping will be in the CF
+        property_name_nested: Ref
 
   AWS::EC2::NatGateway:
     type: process
@@ -42,6 +46,10 @@ technical-assets:
     size: component
     technology: gateway
     machine: virtual  # maybe machine should be inferred in the code?
+    can_communicate_with: # should be AWS resource types
+      AWS::EC2::EIP:
+        property_name: AllocationId # the name of the property that this mapping will be in the CF
+        property_name_nested: Fn::GetAtt
 
   AWS::EC2::EIP:
     type: process
@@ -58,7 +66,3 @@ technical-assets:
     size: component
     technology: gateway
     machine: virtual  # maybe machine should be inferred in the code?
-
-data-assets:
-
-communication-links:
