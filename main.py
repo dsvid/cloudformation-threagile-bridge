@@ -211,7 +211,9 @@ for i in communication_links:
     print(i)
 print("\n")
 
-print("resources mapped", resources_mapped)
-print("resources not mapped", resources_not_mapped)
+with open("report.txt", 'w') as report:
+    # write out which resources were mapped, and which weren't
+    print("resources mapped", resources_mapped, file=report)
+    print("resources not mapped", resources_not_mapped, file=report)
 
 print("done")
