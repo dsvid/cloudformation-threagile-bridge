@@ -3,7 +3,7 @@ a project to automatically translate (some) AWS CloudFormation constructs to Thr
 
 ## What does it do?
 
-This script takes an existing threagile yaml input file, and a Cloud Formation template (currently only in json, but hoping to add CF yaml support later).
+This script takes an existing threagile yaml input file, and a Cloud Formation template (either yaml or json).
 
 It will trawl through the Cloud Formation template and look for certain resources, etc. and map them to threagile threat modelling concepts.
 
@@ -22,7 +22,7 @@ We are hoping that it will help to ease *some* of the manual work of defining as
 ## How to run?
 
 Currently the script requires 3 arguments:
-- path to CF template (json only for now)
+- path to CF template (either yaml or json)
 - path to existing threagile yaml to be added to
 - path to output updated threagile yaml to
 
