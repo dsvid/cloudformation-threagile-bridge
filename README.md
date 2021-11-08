@@ -47,7 +47,6 @@ If you have Docker installed and have output to a file called "output_yaml.yaml"
 ```
 docker run --rm -it -v "$(pwd)":/app/work threagile/threagile -verbose -model /app/work/output_yaml.yaml -output /app/work
 ```
-
 ## What would a workflow using this tool + Threagile look like?
 
 We expect that a developer would start with a stub threagile model and fill in the non-automatable parts, e.g. descriptions, business and technical overview, author, etc. as well as any architectural elements which are not yet captured in the cloudformation-threagile-bridge rules.
