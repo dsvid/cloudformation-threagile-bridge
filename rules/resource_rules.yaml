@@ -1,0 +1,64 @@
+# valid threagile mapping types include:
+# outer-trust-boundaries, inner-trust-boundaries, technical-assets, data-assets, communication-links
+
+# for valid type, technology, etc. options, see reference/threagile_v1-0-0_schema.json
+
+tags-available: # any tags used must be declared here
+  - aws:vpc
+  - aws:subnet
+  - aws:routetable
+  - aws:route
+  - aws:natgateway
+  - aws:eip
+  - aws:internetgateway
+
+outer-trust-boundaries:
+  AWS::EC2::VPC:
+    type: network-cloud-security-group
+    tags: aws:vpc
+
+inner-trust-boundaries:
+  AWS::EC2::Subnet:
+    type: network-cloud-security-group
+    tags: aws:subnet
+
+  AWS::EC2::RouteTable:
+    type: network-cloud-security-group
+    tags: aws:routetable
+
+technical-assets:
+  AWS::EC2::Route:
+    type: process
+    tags: aws:route
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual  # maybe machine should be inferred in the code?
+
+  AWS::EC2::NatGateway:
+    type: process
+    tags: aws:natgateway
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual  # maybe machine should be inferred in the code?
+
+  AWS::EC2::EIP:
+    type: process
+    tags: aws:eip
+    usage: business
+    size: component
+    technology: tool
+    machine: virtual  # maybe machine should be inferred in the code?
+
+  AWS::EC2::InternetGateway:
+    type: process
+    tags: aws:internetgateway
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual  # maybe machine should be inferred in the code?
+
+data-assets:
+
+communication-links:
