@@ -114,18 +114,30 @@ def parse_cf_resources_for_technical_assets(cf_template):
                 'tags': [resource_rules['technical-assets'][aws_type]['tags']]
             }
             mark_resource_as_mapped(i)
+            evaluate_trust_boundary = True
             try:
-                for j in cf_data['Resources'][i]['Properties']:
-                    # check for references to trust boundaries and add them as links if found
-                    if 'Ref' in cf_data['Resources'][i]['Properties'][j]:
-                        # just used lower() here because we use the lowercase earlier for the id...
-                        # probably better to reference the actual id of the trust boundary that we defined earlier
-                        # but I just want to get this working lol...
-                        dict_temp = {'technical_assets_inside': [i.lower()]}
-                        if cf_data['Resources'][i]['Properties'][j]['Ref'] in trust_boundaries:
-                            trust_boundaries[cf_data['Resources'][i]['Properties'][j]['Ref']].update(dict_temp)
+                if resource_rules['technical-assets'][aws_type]['meta-tag'] and resource_rules['technical-assets'][aws_type]['meta-tag']:
+                    evaluate_trust_boundary = False
             except KeyError:
-                print(i, "has no properties")
+                print(aws_type, "has no meta-tags")
+            if evaluate_trust_boundary:
+                try:
+                    for j in cf_data['Resources'][i]['Properties']:
+                        # check for references to trust boundaries and add them as links if found
+                        if 'Ref' in str(cf_data['Resources'][i]['Properties'][j]):
+                            # just used lower() here because we use the lowercase earlier for the id...
+                            # probably better to reference the actual id of the trust boundary that we defined earlier
+                            # but I just want to get this working lol...
+                            dict_temp = {'technical_assets_inside': [i.lower()]}
+                            if type(cf_data['Resources'][i]['Properties'][j]) is not list:
+                                if cf_data['Resources'][i]['Properties'][j]['Ref'] in trust_boundaries:
+                                    trust_boundaries[cf_data['Resources'][i]['Properties'][j]['Ref']].update(dict_temp)
+                            else:
+                                for k in cf_data['Resources'][i]['Properties'][j]:
+                                    if k['Ref'] in trust_boundaries:
+                                        trust_boundaries[k['Ref']].update(dict_temp)
+                except KeyError:
+                    print(i, "has no properties")
 
 def parse_for_communication_links(cf_template):
     # trawling the template again, but it's just a bit easier logically, since we already have the technical assets to start
@@ -144,7 +156,12 @@ def parse_for_communication_links(cf_template):
                         print(property_name)
                         # property_name = cf_data['Resources'][j]['Properties'][aws_type][property_name]
                         try:
-                            if type(cf_data['Resources'][i]['Properties'][property_name][property_name_nested]) is list:
+                            if type(cf_data['Resources'][i]['Properties'][property_name]) is list:
+                                if type(cf_data['Resources'][i]['Properties'][property_name][0][property_name_nested]) is list:
+                                    link_target = cf_data['Resources'][i]['Properties'][property_name][0][property_name_nested][0].lower()
+                                else:
+                                    link_target = cf_data['Resources'][i]['Properties'][property_name][0][property_name_nested].lower()
+                            elif type(cf_data['Resources'][i]['Properties'][property_name][property_name_nested]) is list:
                                 link_target = cf_data['Resources'][i]['Properties'][property_name][property_name_nested][0].lower()
                             else:
                                 link_target = cf_data['Resources'][i]['Properties'][property_name][property_name_nested].lower()
