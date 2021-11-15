@@ -117,7 +117,7 @@ def parse_cf_resources_for_technical_assets(cf_template):
             try:
                 for j in cf_data['Resources'][i]['Properties']:
                     # check for references to trust boundaries and add them as links if found
-                    if 'Ref' in cf_data['Resources'][i]['Properties'][j]:
+                    if 'Ref' in str(cf_data['Resources'][i]['Properties'][j]):
                         # just used lower() here because we use the lowercase earlier for the id...
                         # probably better to reference the actual id of the trust boundary that we defined earlier
                         # but I just want to get this working lol...

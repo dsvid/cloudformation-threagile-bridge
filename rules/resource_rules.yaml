@@ -11,6 +11,23 @@ tags-available: # any tags used must be declared here
   - aws:natgateway
   - aws:eip
   - aws:internetgateway
+  - aws:securitygroup
+  - aws:service
+  - aws:targetgroup
+  - aws:cluster
+  - aws:subnetroutetableassociation
+  - aws:vpcgatewayattachment
+  - aws:loadbalancer
+  - aws:securitygroupegress
+  - aws:loadbalancinglistener
+  - aws:iamrole
+  - aws:taskdefinition
+  - aws:region
+  - aws:loggroup
+  - aws:iampolicy
+  - aws:service
+  - aws:securitygroupingress
+  - aws:metadata
 
 outer-trust-boundaries:
   AWS::EC2::VPC:
@@ -66,3 +83,141 @@ technical-assets:
     size: component
     technology: gateway
     machine: virtual  # maybe machine should be inferred in the code?
+
+### below added with placeholder info for now
+
+  AWS::EC2::SecurityGroup:
+    type: process
+    tags: aws:securitygroup
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  AWS::EC2::Service:
+    type: process
+    tags: aws:service
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  AWS::ElasticLoadBalancingV2::TargetGroup:
+    type: process
+    tags: aws:targetgroup
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  AWS::ECS::Cluster:
+    type: process
+    tags: aws:cluster
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  AWS::EC2::SubnetRouteTableAssociation:
+    type: process
+    tags: aws:subnetroutetableassociation
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  AWS::EC2::VPCGatewayAttachment:
+    type: process
+    tags: aws:vpcgatewayattachment
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  # AWS::ElasticLoadBalancingV2::LoadBalancer:
+  #   type: process
+  #   tags: aws:loadbalancer
+  #   usage: business
+  #   size: component
+  #   technology: gateway
+  #   machine: virtual
+
+  AWS::EC2::SecurityGroupEgress:
+    type: process
+    tags: aws:securitygroupegress
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  # AWS::ElasticLoadBalancingV2::Listener:
+  #   type: process
+  #   tags: aws:loadbalancinglistener
+  #   usage: business
+  #   size: component
+  #   technology: gateway
+  #   machine: virtual
+
+  AWS::IAM::Role:
+    type: process
+    tags: aws:iamrole
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  # AWS::ECS::TaskDefinition:
+  #   type: process
+  #   tags: aws:taskdefinition
+  #   usage: business
+  #   size: component
+  #   technology: gateway
+  #   machine: virtual
+
+  AWS::Region:
+    type: process
+    tags: aws:region
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  AWS::Logs::LogGroup:
+    type: process
+    tags: aws:loggroup
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  # AWS::IAM::Policy:
+  #   type: process
+  #   tags: aws:iampolicy
+  #   usage: business
+  #   size: component
+  #   technology: gateway
+  #   machine: virtual
+
+  # AWS::ECS::Service:
+  #   type: process
+  #   tags: aws:service
+  #   usage: business
+  #   size: component
+  #   technology: gateway
+  #   machine: virtual
+
+  AWS::EC2::SecurityGroupIngress:
+    type: process
+    tags: aws:securitygroupingress
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+
+  AWS::CDK::Metadata:
+    type: process
+    tags: aws:metadata
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
