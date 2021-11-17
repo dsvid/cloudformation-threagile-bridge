@@ -1,4 +1,5 @@
-import json, yaml, sys, os, itertools, csv
+import json, yaml, sys, os
+# import itertools, csv
 
 # parse the command line arguments
 path_to_cf_template = sys.argv[1]
