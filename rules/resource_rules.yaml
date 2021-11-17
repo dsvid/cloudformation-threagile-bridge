@@ -11,19 +11,35 @@ tags-available: # any tags used must be declared here
   - aws:natgateway
   - aws:eip
   - aws:internetgateway
+  - aws:service
+  - aws:targetgroup
+  - aws:cluster
+  - aws:subnetroutetableassociation
+  - aws:vpcgatewayattachment
+  - aws:loadbalancer
+  - aws:securitygroup
+  - aws:securitygroupegress
+  - aws:securitygroupingress
+  - aws:loadbalancinglistener
+  - aws:iamrole
+  - aws:taskdefinition
+  - aws:region
+  - aws:loggroup
+  - aws:iampolicy
+  - aws:metadata
 
 outer-trust-boundaries:
   AWS::EC2::VPC:
-    type: network-cloud-security-group
+    type: network-virtual-lan
     tags: aws:vpc
 
 inner-trust-boundaries:
   AWS::EC2::Subnet:
-    type: network-cloud-security-group
+    type: network-virtual-lan
     tags: aws:subnet
 
   AWS::EC2::RouteTable:
-    type: network-cloud-security-group
+    type: network-virtual-lan
     tags: aws:routetable
 
 technical-assets:
@@ -36,8 +52,12 @@ technical-assets:
     machine: virtual  # maybe machine should be inferred in the code?
     can_communicate_with: # should be AWS resource types
       AWS::EC2::NatGateway:
-        property_name: NatGatewayId # the name of the property that this mapping will be in the CF
-        property_name_nested: Ref
+        property_name: 
+          - NatGatewayId # the name of the property that this mapping will be in the CF
+          - GatewayId
+        property_name_nested: 
+          - Ref
+          - Ref
 
   AWS::EC2::NatGateway:
     type: process
@@ -45,11 +65,15 @@ technical-assets:
     usage: business
     size: component
     technology: gateway
+    integrity: critical
+    availability: critical
     machine: virtual  # maybe machine should be inferred in the code?
     can_communicate_with: # should be AWS resource types
       AWS::EC2::EIP:
-        property_name: AllocationId # the name of the property that this mapping will be in the CF
-        property_name_nested: Fn::GetAtt
+        property_name: 
+          - AllocationId # the name of the property that this mapping will be in the CF
+        property_name_nested:
+          - Fn::GetAtt
 
   AWS::EC2::EIP:
     type: process
@@ -57,6 +81,8 @@ technical-assets:
     usage: business
     size: component
     technology: tool
+    integrity: critical
+    availability: critical
     machine: virtual  # maybe machine should be inferred in the code?
 
   AWS::EC2::InternetGateway:
@@ -66,3 +92,201 @@ technical-assets:
     size: component
     technology: gateway
     machine: virtual  # maybe machine should be inferred in the code?
+
+  AWS::ECS::Service:
+    type: process
+    tags: aws:service
+    usage: business
+    size: service
+    technology: container-platform
+    machine: virtual
+    can_communicate_with: # should be AWS resource types
+      AWS::ECS::TaskDefinition:
+        property_name: 
+          - TaskDefinition # the name of the property that this mapping will be in the CF
+        property_name_nested: 
+          - Ref
+      AWS::ECS::Cluster:
+        property_name: 
+          - Cluster # the name of the property that this mapping will be in the CF
+        property_name_nested: 
+          - Ref
+
+  AWS::ElasticLoadBalancingV2::TargetGroup:
+    type: process
+    tags: aws:targetgroup
+    usage: business
+    size: component
+    technology: load-balancer
+    machine: virtual
+
+  AWS::ECS::Cluster:
+    type: process
+    tags: aws:cluster
+    usage: business
+    size: component
+    technology: container-platform
+    machine: virtual
+
+  AWS::EC2::VPCGatewayAttachment:
+    type: process
+    tags: aws:vpcgatewayattachment
+    usage: business
+    size: component
+    technology: gateway
+    machine: virtual
+    can_communicate_with: # should be AWS resource types
+      AWS::EC2::Route:
+        property_name: 
+          - InternetGatewayId # the name of the property that this mapping will be in the CF
+        property_name_nested:
+          - Ref
+
+  AWS::ElasticLoadBalancingV2::LoadBalancer:
+    type: process
+    tags: aws:loadbalancer
+    usage: business
+    size: component
+    technology: load-balancer
+    machine: virtual
+    meta-tag: not-inside-trust-boundary
+    can_communicate_with: # should be AWS resource types
+      AWS::EC2::SecurityGroup:
+        property_name: 
+          - SecurityGroups # the name of the property that this mapping will be in the CF
+        property_name_nested:
+          - Fn::GetAtt
+
+  AWS::EC2::SecurityGroup:
+    type: process
+    tags: aws:securitygroup
+    usage: business
+    size: component
+    technology: unknown-technology
+    machine: virtual
+
+  AWS::EC2::SecurityGroupEgress:
+    type: process
+    tags: aws:securitygroupegress
+    usage: business
+    size: component
+    technology: unknown-technology
+    machine: virtual
+    can_communicate_with: # should be AWS resource types
+      AWS::EC2::SecurityGroup:
+        property_name: 
+          - GroupId # the name of the property that this mapping will be in the CF
+        property_name_nested: 
+          - Fn::GetAtt
+
+  AWS::EC2::SecurityGroupIngress:
+    type: process
+    tags: aws:securitygroupingress
+    usage: business
+    size: component
+    technology: unknown-technology
+    machine: virtual
+    can_communicate_with: # should be AWS resource types
+      AWS::EC2::SecurityGroup:
+        property_name: 
+          - SourceSecurityGroupId # the name of the property that this mapping will be in the CF
+        property_name_nested: 
+          - Fn::GetAtt
+      AWS::EC2::SecurityGroupEgress:
+        property_name: 
+          - GroupId
+        property_name_nested: 
+          - Fn::GetAtt
+      AWS::ElasticLoadBalancingV2::LoadBalancer:
+        property_name: 
+          - SourceSecurityGroupId
+        property_name_nested: 
+          - Fn::GetAtt
+
+  AWS::ElasticLoadBalancingV2::Listener:
+    type: process
+    tags: aws:loadbalancinglistener
+    usage: business
+    size: component
+    technology: load-balancer
+    machine: virtual
+    can_communicate_with: # should be AWS resource types
+      AWS::ElasticLoadBalancingV2::LoadBalancer:
+        property_name: 
+          - LoadBalancerArn # the name of the property that this mapping will be in the CF
+        property_name_nested: 
+          - Ref
+
+  AWS::IAM::Role:
+    type: process
+    tags: aws:iamrole
+    usage: business
+    size: component
+    technology: identity-provider
+    machine: virtual
+    integrity: critical
+    availability: critical
+
+  AWS::ECS::TaskDefinition:
+    type: process
+    tags: aws:taskdefinition
+    usage: business
+    size: component
+    technology: task
+    machine: virtual
+    can_communicate_with: # should be AWS resource types
+      AWS::IAM::Role:
+        property_name: 
+          - ExecutionRoleArn # the name of the property that this mapping will be in the CF
+          - TaskRoleArn
+        property_name_nested: 
+          - Fn::GetAtt
+          - Fn::GetAtt
+
+  AWS::IAM::Policy:
+    type: process
+    tags: aws:iampolicy
+    usage: business
+    size: component
+    technology: identity-provider
+    machine: virtual
+    can_communicate_with: # should be AWS resource types
+      AWS::IAM::Role:
+        property_name: 
+          - Roles # the name of the property that this mapping will be in the CF
+        property_name_nested: 
+          - Ref
+
+  # additional placeholders -- uncomment to use
+
+  # AWS::CDK::Metadata:
+  #   type: process
+  #   tags: aws:metadata
+  #   usage: business
+  #   size: component
+  #   technology: gateway
+  #   machine: virtual
+
+  # AWS::Region:
+  #   type: process
+  #   tags: aws:region
+  #   usage: business
+  #   size: component
+  #   technology: gateway
+  #   machine: virtual
+
+  # AWS::Logs::LogGroup:
+  #   type: process
+  #   tags: aws:loggroup
+  #   usage: business
+  #   size: component
+  #   technology: gateway
+  #   machine: virtual
+  
+  # AWS::EC2::SubnetRouteTableAssociation:
+  #   type: process
+  #   tags: aws:subnetroutetableassociation
+  #   usage: business
+  #   size: component
+  #   technology: gateway
+  #   machine: virtual

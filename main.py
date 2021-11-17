@@ -1,4 +1,4 @@
-import json, yaml, sys, os
+import json, yaml, sys, os, itertools, csv
 
 # parse the command line arguments
 path_to_cf_template = sys.argv[1]
@@ -114,18 +114,34 @@ def parse_cf_resources_for_technical_assets(cf_template):
                 'tags': [resource_rules['technical-assets'][aws_type]['tags']]
             }
             mark_resource_as_mapped(i)
+            evaluate_trust_boundary = True
             try:
-                for j in cf_data['Resources'][i]['Properties']:
-                    # check for references to trust boundaries and add them as links if found
-                    if 'Ref' in cf_data['Resources'][i]['Properties'][j]:
-                        # just used lower() here because we use the lowercase earlier for the id...
-                        # probably better to reference the actual id of the trust boundary that we defined earlier
-                        # but I just want to get this working lol...
-                        dict_temp = {'technical_assets_inside': [i.lower()]}
-                        if cf_data['Resources'][i]['Properties'][j]['Ref'] in trust_boundaries:
-                            trust_boundaries[cf_data['Resources'][i]['Properties'][j]['Ref']].update(dict_temp)
+                if resource_rules['technical-assets'][aws_type]['meta-tag'] and resource_rules['technical-assets'][aws_type]['meta-tag']:
+                    evaluate_trust_boundary = False
             except KeyError:
-                print(i, "has no properties")
+                print(aws_type, "has no meta-tags")
+            if evaluate_trust_boundary:
+                try:
+                    for j in cf_data['Resources'][i]['Properties']:
+                        # check for references to trust boundaries and add them as links if found
+                        if 'Ref' in str(cf_data['Resources'][i]['Properties'][j]):
+                            # just used lower() here because we use the lowercase earlier for the id...
+                            # probably better to reference the actual id of the trust boundary that we defined earlier
+                            # but I just want to get this working lol...
+                            dict_temp = {'technical_assets_inside': [i.lower()]}
+                            asset_ref = i.lower()
+                            if type(cf_data['Resources'][i]['Properties'][j]) is not list:
+                                if cf_data['Resources'][i]['Properties'][j]['Ref'] in trust_boundaries:
+                                    # trust_boundaries[cf_data['Resources'][i]['Properties'][j]['Ref']].update(dict_temp)
+                                    trust_boundaries[cf_data['Resources'][i]['Properties'][j]['Ref']].setdefault('technical_assets_inside',[]).append(asset_ref)
+                            else:
+                                for k in cf_data['Resources'][i]['Properties'][j]:
+                                    if k['Ref'] in trust_boundaries:
+                                        # trust_boundaries[k['Ref']].update(dict_temp)
+                                        trust_boundaries[k['Ref']].setdefault('technical_assets_inside',[]).append(asset_ref)
+
+                except KeyError:
+                    print(i, "has no properties")
 
 def parse_for_communication_links(cf_template):
     # trawling the template again, but it's just a bit easier logically, since we already have the technical assets to start
@@ -139,30 +155,38 @@ def parse_for_communication_links(cf_template):
                 for j in technical_assets:
                     asset_type = technical_assets[j]['aws-type']
                     if asset_type in resource_rules['technical-assets'][aws_type]['can_communicate_with']:
-                        property_name = resource_rules['technical-assets'][aws_type]['can_communicate_with'][asset_type]['property_name']
-                        property_name_nested =  resource_rules['technical-assets'][aws_type]['can_communicate_with'][asset_type]['property_name_nested']
-                        print(property_name)
-                        # property_name = cf_data['Resources'][j]['Properties'][aws_type][property_name]
-                        try:
-                            if type(cf_data['Resources'][i]['Properties'][property_name][property_name_nested]) is list:
-                                link_target = cf_data['Resources'][i]['Properties'][property_name][property_name_nested][0].lower()
-                            else:
-                                link_target = cf_data['Resources'][i]['Properties'][property_name][property_name_nested].lower()
-                            print("link target is: ", link_target)
-                            link_name = 'Link to ' + link_target
-                            link = {link_name: {
-                                'target': link_target,
-                                'protocol': 'https',
-                                'authentication': 'none',
-                                'authorization': 'none',
-                                'usage': 'business'
+                        property_names = resource_rules['technical-assets'][aws_type]['can_communicate_with'][asset_type]['property_name']
+                        property_nested_names = resource_rules['technical-assets'][aws_type]['can_communicate_with'][asset_type]['property_name_nested']
+                        for pn, pnn in zip(property_names, property_nested_names):
+                            property_name = pn
+                            property_name_nested =  pnn
+                            print(property_name)
+                            # property_name = cf_data['Resources'][j]['Properties'][aws_type][property_name]
+                            try:
+                                if type(cf_data['Resources'][i]['Properties'][property_name]) is list:
+                                    if type(cf_data['Resources'][i]['Properties'][property_name][0][property_name_nested]) is list:
+                                        link_target = cf_data['Resources'][i]['Properties'][property_name][0][property_name_nested][0].lower()
+                                    else:
+                                        link_target = cf_data['Resources'][i]['Properties'][property_name][0][property_name_nested].lower()
+                                elif type(cf_data['Resources'][i]['Properties'][property_name][property_name_nested]) is list:
+                                    link_target = cf_data['Resources'][i]['Properties'][property_name][property_name_nested][0].lower()
+                                else:
+                                    link_target = cf_data['Resources'][i]['Properties'][property_name][property_name_nested].lower()
+                                print("link target is: ", link_target)
+                                link_name = 'Link to ' + link_target
+                                link = {link_name: {
+                                    'target': link_target,
+                                    'protocol': 'https',
+                                    'authentication': 'none',
+                                    'authorization': 'none',
+                                    'usage': 'business'
+                                        }
                                     }
-                                }
-                            links['communication_links'].update(link)
-                            
-                            # add the link to the asset
-                            technical_assets[i].update(links)
-                        except Exception as e: print("error occured: ", repr(e), "j value: ", j, "i value: ", i, "property_name_nested: ", property_name_nested)
+                                links['communication_links'].update(link)
+                                
+                                # add the link to the asset
+                                technical_assets[i].update(links)
+                            except Exception as e: print("error occured: ", repr(e), "j value: ", j, "i value: ", i, "property_name_nested: ", property_name_nested)
 
 # run the parser functions and print out the status 
 # (maybe better to use logging, but print is fine for now)
@@ -211,9 +235,14 @@ for i in communication_links:
     print(i)
 print("\n")
 
-with open("report.txt", 'w') as report:
-    # write out which resources were mapped, and which weren't
-    print("resources mapped", resources_mapped, file=report)
-    print("resources not mapped", resources_not_mapped, file=report)
+# with open("report.txt", 'w') as report:
+#     # write out which resources were mapped, and which weren't
+#     print("resources mapped", resources_mapped, file=report)
+#     print("resources not mapped", resources_not_mapped, file=report)
+
+with open("report.csv", "w", newline="") as report:
+    writer = csv.writer(report)
+    writer.writerow(["AWS Resources Mapped", "AWS Resources Not Mapped"])
+    writer.writerows(itertools.zip_longest(resources_mapped, resources_not_mapped))
 
 print("done")
