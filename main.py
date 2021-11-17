@@ -235,14 +235,14 @@ for i in communication_links:
     print(i)
 print("\n")
 
-# with open("report.txt", 'w') as report:
-#     # write out which resources were mapped, and which weren't
-#     print("resources mapped", resources_mapped, file=report)
-#     print("resources not mapped", resources_not_mapped, file=report)
+with open("cf-threagile-bridge-report.txt", 'w') as report:
+    # write out which resources were mapped, and which weren't
+    print("resources mapped", resources_mapped, file=report)
+    print("resources not mapped", resources_not_mapped, file=report)
 
-with open("report.csv", "w", newline="") as report:
-    writer = csv.writer(report)
-    writer.writerow(["AWS Resources Mapped", "AWS Resources Not Mapped"])
-    writer.writerows(itertools.zip_longest(resources_mapped, resources_not_mapped))
+# with open("report.csv", "w", newline="") as report:
+#     writer = csv.writer(report)
+#     writer.writerow(["AWS Resources Mapped", "AWS Resources Not Mapped"])
+#     writer.writerows(itertools.zip_longest(resources_mapped, resources_not_mapped))
 
 print("done")
