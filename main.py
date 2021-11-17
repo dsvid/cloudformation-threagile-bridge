@@ -239,7 +239,7 @@ print("\n")
 with open("cf-threagile-bridge-report.txt", 'w') as report:
     # write out which resources were mapped, and which weren't
     print("resources mapped", resources_mapped, file=report)
-    print("resources not mapped", resources_not_mapped, file=report)
+    print("\nresources not mapped", resources_not_mapped, file=report)
 
 # with open("report.csv", "w", newline="") as report:
 #     writer = csv.writer(report)
