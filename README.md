@@ -67,10 +67,9 @@ This project is still in progress, so the number of Cloud Formation -> Threagile
 
 Beyond more mappings, the primary features that I am hoping to add is a report of which Cloud Formation concepts have been auto-mapped, and which have not, plus the ability to detect when a CloudFormation concept has already been mapped (so as not to duplicate it).
 
-Additionally, my current to-do list is:
+Additionally, some of the things on my current to-do list are:
 
 - split up the project into separate files
-- add translation of communication links
 - expand the list of existing translations
 - make the existing translations "smarter" (there are still some hardcoded values, e.g. technical asset 'technology' is hardcoded to 'web-service-rest' to just get things up and running)
 - add unit tests
