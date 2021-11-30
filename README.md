@@ -63,9 +63,11 @@ This tool can be run in a fully automated pipeline, but as this tool is still re
 
 ## Can I add new rules/heuristics
 
-Yes! AWS has a lot of tools available, and we will likely not be able to capture them all in this tool even as the tool matures (AWS keep adding more stuff!). 
+Yes! AWS has a lot of tools available, and we will likely not be able to capture them all in this tool even as the tool matures (AWS keep adding more stuff!).
 
 We have also made this tool open source, with the intention of allowing you to define your own additional rules for CloudFormation to Threagile translation depending on your use case. This is similar to the way that Threagile provides the ability to define custom rules.
+
+I am hoping to provide additional documentation on this process at a later stage.
 
 ## What does it not yet do?
 
