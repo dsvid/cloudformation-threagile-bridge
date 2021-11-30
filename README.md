@@ -1,6 +1,10 @@
 # cloudformation-threagile-bridge
 a project to automatically translate (some) AWS CloudFormation constructs to Threagile's asset/communication link/trust boundary model to aid with agile threat modelling using Threagile (https://threagile.io/)
 
+There is a video demo available here: https://youtu.be/0tWYThqeanA
+
+NOTE: This tool is still in a fairly early state, see the "Future improvements" section below for features that we would like to add later.
+
 ## What does it do?
 
 This script takes an existing threagile yaml input file, and a Cloud Formation template (either yaml or json).
@@ -55,6 +59,8 @@ Then this tool can be run to automatically capture concepts defined in a Cloud F
 
 This could be done either on the local command line before a commit, or in a pipeline.
 
+This tool can be run in a fully automated pipeline, but as this tool is still fairly new, it may be preferable to run this locally and check/refine its output manually afterward.
+
 ## Can I add new rules/heuristics
 
 Yes! AWS has a lot of tools available, and we will likely not be able to capture them all in this tool even as the tool matures (AWS keep adding more stuff!). 
@@ -63,16 +69,21 @@ We have also made this tool open source, with the intention of allowing you to d
 
 ## What does it not yet do?
 
-This project is still in progress, so the number of Cloud Formation -> Threagile mappings is currently limited. We are continuing to add more mappings, and this will be an ongoing process.
+This project is still in a fairly early stage, so the number of Cloud Formation -> Threagile mappings is currently limited. We are continuing to add more mappings, and this will be an ongoing process.
 
-Beyond more mappings, the primary features that I am hoping to add is a report of which Cloud Formation concepts have been auto-mapped, and which have not, plus the ability to detect when a CloudFormation concept has already been mapped (so as not to duplicate it).
+We are also intending to add the following features over time:
 
-Additionally, some of the things on my current to-do list are:
+- Automated inference of authentication/protocol/machine type from CF template
 
-- split up the project into separate files
-- expand the list of existing translations
-- make the existing translations "smarter" (there are still some hardcoded values, e.g. technical asset 'technology' is hardcoded to 'web-service-rest' to just get things up and running)
-- add unit tests
+- Duplicate checking (i.e. to check if the resource is already in the stub)
+
+- Improved support for complicated relationship definitions such as Communication between assets & trust boundaries
+
+- More generalized trust boundary definitions
+
+- Investigation into feasibility of auto-translation of data assets and shared runtimes (in addition to trust boundaries, technical assets & comm. links)
+
+- Additional default rules
 
 ## Are you associated with Threagile?
 
