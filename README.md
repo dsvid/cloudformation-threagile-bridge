@@ -59,7 +59,7 @@ Then this tool can be run to automatically capture concepts defined in a Cloud F
 
 This could be done either on the local command line before a commit, or in a pipeline.
 
-This tool can be run in a fully automated pipeline, but as this tool is still fairly new, it may be preferable to run this locally and check/refine its output manually afterward.
+This tool can be run in a fully automated pipeline, but as this tool is still relatively early in development, it may be preferable to run this locally and check/refine its output manually afterward.
 
 ## Can I add new rules/heuristics
 
